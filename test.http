@@ -1,0 +1,39 @@
+### 1. Register a New User
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "password": "password123",
+  "role": "ROLE_USER"
+}
+
+###
+
+### 2. Login to Get JWT Token
+# @name login
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane.doe@example.com",
+  "password": "password123"
+}
+
+###
+
+### 3. Attempt to Access Secured Endpoint without JWT (Should fail with 401)
+GET http://localhost:8080/projects
+
+###
+
+### 4. Access Secured Endpoint with JWT Token (Replace {{token}} or use login response token)
+# Replace the token below with the token received from step 2
+GET http://localhost:8080/projects
+Authorization: Bearer <paste_token_here>
+
+###
+
+### 5. Access H2 Console (Should be accessible/allowed)
+GET http://localhost:8080/h2-console
