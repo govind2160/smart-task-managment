@@ -116,6 +116,23 @@ public class DatabaseSeeder implements CommandLineRunner {
             mobileWallet.setDeadline(LocalDate.parse("2026-07-20"));
             mobileWallet.getMembers().add(kabir);
 
+            Project swachhBharat = new Project("Swachh Bharat Cleanliness", "Community cleanliness campaign and waste tracking dashboard.", ProjectStatus.ACTIVE, aarav);
+            swachhBharat.setDeadline(LocalDate.parse("2026-07-25"));
+            swachhBharat.getMembers().add(aditi);
+
+            Project farmerApp = new Project("Digital India Farmer App", "Portal for direct crop selling and weather updates for farmers.", ProjectStatus.ACTIVE, rahul);
+            farmerApp.setDeadline(LocalDate.parse("2026-08-10"));
+            farmerApp.getMembers().add(priya);
+            farmerApp.getMembers().add(ishaan);
+
+            Project roverSim = new Project("Chandrayaan Rover Sim", "Lunar terrain traversal simulation and telemetry viewer.", ProjectStatus.PLANNED, ishaan);
+            roverSim.setDeadline(LocalDate.parse("2026-10-15"));
+            roverSim.getMembers().add(arjun);
+
+            Project handloomStore = new Project("Mitti Handloom Store", "E-commerce platform for rural Indian artisans and weavers.", ProjectStatus.ACTIVE, priya);
+            handloomStore.setDeadline(LocalDate.parse("2026-09-05"));
+            handloomStore.getMembers().add(ananya);
+
             collegePortal = projectRepository.save(collegePortal);
             smartTaskApp = projectRepository.save(smartTaskApp);
             mobileApp = projectRepository.save(mobileApp);
@@ -130,6 +147,10 @@ public class DatabaseSeeder implements CommandLineRunner {
             billingEngine = projectRepository.save(billingEngine);
             analyticsTool = projectRepository.save(analyticsTool);
             mobileWallet = projectRepository.save(mobileWallet);
+            swachhBharat = projectRepository.save(swachhBharat);
+            farmerApp = projectRepository.save(farmerApp);
+            roverSim = projectRepository.save(roverSim);
+            handloomStore = projectRepository.save(handloomStore);
 
             // Seed Tasks (17 tasks total)
             Task task1 = new Task("Setup Schema", TaskStatus.COMPLETED, collegePortal, aarav, aarav);
@@ -200,6 +221,22 @@ public class DatabaseSeeder implements CommandLineRunner {
             task17.setDeadline(LocalDate.parse("2026-06-15"));
             task17.setCreatedAt(LocalDateTime.of(2026, 6, 7, 9, 30, 0));
 
+            Task task18 = new Task("Organize Local Volunteer Drive", TaskStatus.COMPLETED, swachhBharat, aarav, aditi);
+            task18.setDeadline(LocalDate.parse("2026-06-12"));
+            task18.setCreatedAt(LocalDateTime.of(2026, 6, 8, 9, 0, 0));
+
+            Task task19 = new Task("Translate UI to Hindi and Tamil", TaskStatus.IN_PROGRESS, farmerApp, rahul, priya);
+            task19.setDeadline(LocalDate.parse("2026-07-05"));
+            task19.setCreatedAt(LocalDateTime.of(2026, 6, 12, 10, 0, 0));
+
+            Task task20 = new Task("Optimize Pathfinding Algorithms", TaskStatus.PENDING, roverSim, ishaan, arjun);
+            task20.setDeadline(LocalDate.parse("2026-07-20"));
+            task20.setCreatedAt(LocalDateTime.of(2026, 6, 15, 14, 30, 0));
+
+            Task task21 = new Task("Onboard Weaver Cooperatives", TaskStatus.IN_PROGRESS, handloomStore, priya, ananya);
+            task21.setDeadline(LocalDate.parse("2026-06-30"));
+            task21.setCreatedAt(LocalDateTime.of(2026, 6, 10, 11, 0, 0));
+
             taskRepository.save(task1);
             taskRepository.save(task2);
             taskRepository.save(task3);
@@ -217,6 +254,10 @@ public class DatabaseSeeder implements CommandLineRunner {
             taskRepository.save(task15);
             taskRepository.save(task16);
             taskRepository.save(task17);
+            taskRepository.save(task18);
+            taskRepository.save(task19);
+            taskRepository.save(task20);
+            taskRepository.save(task21);
 
             System.out.println("====================================================================");
             System.out.println("Database seeded successfully with default users, projects, and tasks.");

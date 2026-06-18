@@ -33,11 +33,11 @@ public class TaskService {
         Project project = projectRepository.findById(taskDto.getProjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + taskDto.getProjectId()));
 
-        // Check if creator is a member of the project
-        boolean isMember = project.getMembers().stream()
-                .anyMatch(m -> m.getId().equals(creator.getId()));
-        if (creator.getRole() != Role.ROLE_ADMIN && !isMember) {
-            throw new IllegalArgumentException("Access denied: You are not a member of this project");
+        // Check if creator is a member or owner of the project
+        boolean isOwnerOrMember = project.getOwner().getId().equals(creator.getId()) ||
+                                  project.getMembers().stream().anyMatch(m -> m.getId().equals(creator.getId()));
+        if (creator.getRole() != Role.ROLE_ADMIN && !isOwnerOrMember) {
+            throw new IllegalArgumentException("Access denied: You are not a member or owner of this project");
         }
 
         User assignee = null;
@@ -45,11 +45,11 @@ public class TaskService {
             assignee = userRepository.findById(taskDto.getAssignedToId())
                     .orElseThrow(() -> new ResourceNotFoundException("Assignee user not found"));
             
-            // Check if assignee is a member of the project
-            boolean isAssigneeMember = project.getMembers().stream()
-                    .anyMatch(m -> m.getId().equals(taskDto.getAssignedToId()));
+            // Check if assignee is a member or owner of the project
+            boolean isAssigneeMember = project.getOwner().getId().equals(taskDto.getAssignedToId()) ||
+                                       project.getMembers().stream().anyMatch(m -> m.getId().equals(taskDto.getAssignedToId()));
             if (!isAssigneeMember) {
-                throw new IllegalArgumentException("Assignee must be a member of the project");
+                throw new IllegalArgumentException("Assignee must be a member or owner of the project");
             }
         }
 
@@ -65,7 +65,7 @@ public class TaskService {
         if (user.getRole() == Role.ROLE_ADMIN) {
             tasks = taskRepository.findAll();
         } else {
-            tasks = taskRepository.findByProjectMembersId(user.getId());
+            tasks = taskRepository.findByProjectOwnerIdOrMembersId(user.getId());
         }
         return tasks.stream()
                 .map(this::convertToDto)
@@ -79,7 +79,7 @@ public class TaskService {
             task = taskRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
         } else {
-            task = taskRepository.findByIdAndProjectMembersId(id, user.getId())
+            task = taskRepository.findByIdAndProjectOwnerIdOrMembersId(id, user.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id + " or access denied"));
         }
         return convertToDto(task);
@@ -91,10 +91,10 @@ public class TaskService {
 
         Project project = task.getProject();
         boolean isAdmin = user.getRole() == Role.ROLE_ADMIN;
-        boolean isMember = isAdmin || project.getMembers().stream()
+        boolean isMember = isAdmin || project.getOwner().getId().equals(user.getId()) || project.getMembers().stream()
                 .anyMatch(m -> m.getId().equals(user.getId()));
         if (!isMember) {
-            throw new IllegalArgumentException("Access denied: You are not a member of this project");
+            throw new IllegalArgumentException("Access denied: You are not a member or owner of this project");
         }
 
         boolean isOwner = isAdmin || project.getOwner().getId().equals(user.getId());
@@ -117,7 +117,7 @@ public class TaskService {
                 Project newProject = projectRepository.findById(taskDto.getProjectId())
                         .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + taskDto.getProjectId()));
                 // Verify owner is also owner/member of the new project
-                boolean isNewMember = isAdmin || newProject.getMembers().stream()
+                boolean isNewMember = isAdmin || newProject.getOwner().getId().equals(user.getId()) || newProject.getMembers().stream()
                         .anyMatch(m -> m.getId().equals(user.getId()));
                 if (!isNewMember) {
                     throw new IllegalArgumentException("Cannot move task to a project you don't belong to");
@@ -129,10 +129,10 @@ public class TaskService {
             if (taskDto.getAssignedToId() != null) {
                 User newAssignee = userRepository.findById(taskDto.getAssignedToId())
                         .orElseThrow(() -> new ResourceNotFoundException("Assignee user not found"));
-                boolean isAssigneeMember = project.getMembers().stream()
-                        .anyMatch(m -> m.getId().equals(taskDto.getAssignedToId()));
+                boolean isAssigneeMember = project.getOwner().getId().equals(taskDto.getAssignedToId()) ||
+                                           project.getMembers().stream().anyMatch(m -> m.getId().equals(taskDto.getAssignedToId()));
                 if (!isAssigneeMember) {
-                    throw new IllegalArgumentException("Assignee must be a member of the project");
+                    throw new IllegalArgumentException("Assignee must be a member or owner of the project");
                 }
                 task.setAssignedTo(newAssignee);
             } else {
@@ -161,20 +161,21 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
 
         Project project = task.getProject();
-        boolean isMember = user.getRole() == Role.ROLE_ADMIN || project.getMembers().stream()
-                .anyMatch(m -> m.getId().equals(user.getId()));
+        boolean isMember = user.getRole() == Role.ROLE_ADMIN || 
+                           project.getOwner().getId().equals(user.getId()) ||
+                           project.getMembers().stream().anyMatch(m -> m.getId().equals(user.getId()));
         if (!isMember) {
-            throw new IllegalArgumentException("Access denied: You are not a member of this project");
+            throw new IllegalArgumentException("Access denied: You are not a member or owner of this project");
         }
 
         User assignee = null;
         if (assigneeId != null) {
             assignee = userRepository.findById(assigneeId)
                     .orElseThrow(() -> new ResourceNotFoundException("Assignee user not found"));
-            boolean isAssigneeMember = project.getMembers().stream()
-                    .anyMatch(m -> m.getId().equals(assigneeId));
+            boolean isAssigneeMember = project.getOwner().getId().equals(assigneeId) ||
+                                       project.getMembers().stream().anyMatch(m -> m.getId().equals(assigneeId));
             if (!isAssigneeMember) {
-                throw new IllegalArgumentException("Assignee must be a member of the project");
+                throw new IllegalArgumentException("Assignee must be a member or owner of the project");
             }
         }
 

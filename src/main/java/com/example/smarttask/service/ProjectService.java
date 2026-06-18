@@ -46,7 +46,7 @@ public class ProjectService {
                     .map(this::convertToDto)
                     .collect(Collectors.toList());
         }
-        return projectRepository.findByMembersId(user.getId())
+        return projectRepository.findByOwnerIdOrMembersId(user.getId())
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -88,14 +88,14 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + projectId));
 
-        boolean isMember = project.getMembers().stream()
-                .anyMatch(m -> m.getId().equals(user.getId()));
-        if (user.getRole() != Role.ROLE_ADMIN && !isMember) {
-            throw new IllegalArgumentException("Access denied: You are not a member of this project");
+        boolean isOwnerOrMember = project.getOwner().getId().equals(user.getId()) ||
+                                  project.getMembers().stream().anyMatch(m -> m.getId().equals(user.getId()));
+        if (user.getRole() != Role.ROLE_ADMIN && !isOwnerOrMember) {
+            throw new IllegalArgumentException("Access denied: You are not a member or owner of this project");
         }
 
         return project.getMembers().stream()
-                .map(m -> new UserDto(m.getId(), m.getName(), m.getEmail()))
+                .map(m -> new UserDto(m.getId(), m.getName(), m.getEmail(), m.getRole().name()))
                 .collect(Collectors.toList());
     }
 
@@ -114,7 +114,7 @@ public class ProjectService {
         projectRepository.save(project);
 
         return project.getMembers().stream()
-                .map(m -> new UserDto(m.getId(), m.getName(), m.getEmail()))
+                .map(m -> new UserDto(m.getId(), m.getName(), m.getEmail(), m.getRole().name()))
                 .collect(Collectors.toList());
     }
 
@@ -134,7 +134,7 @@ public class ProjectService {
         projectRepository.save(project);
 
         return project.getMembers().stream()
-                .map(m -> new UserDto(m.getId(), m.getName(), m.getEmail()))
+                .map(m -> new UserDto(m.getId(), m.getName(), m.getEmail(), m.getRole().name()))
                 .collect(Collectors.toList());
     }
 

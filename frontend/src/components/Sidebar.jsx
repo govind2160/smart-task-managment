@@ -37,13 +37,14 @@ const Sidebar = () => {
           <span>Tasks</span>
         </NavLink>
         
-        <NavLink 
-          to="/users" 
-          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-        >
-
-          <span>Users</span>
-        </NavLink>
+        {user?.role === 'ROLE_ADMIN' && (
+          <NavLink 
+            to="/users" 
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          >
+            <span>Users</span>
+          </NavLink>
+        )}
       </nav>
       
       <div className="sidebar-footer">

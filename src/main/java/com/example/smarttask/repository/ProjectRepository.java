@@ -18,6 +18,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT DISTINCT p FROM Project p JOIN p.members m WHERE m.id = :userId")
     List<Project> findByMembersId(@Param("userId") Long userId);
 
+    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN p.members m WHERE p.owner.id = :userId OR m.id = :userId")
+    List<Project> findByOwnerIdOrMembersId(@Param("userId") Long userId);
+
     @Query("SELECT p FROM Project p JOIN p.members m WHERE p.id = :projectId AND m.id = :userId")
     Optional<Project> findByIdAndMembersId(@Param("projectId") Long projectId, @Param("userId") Long userId);
 

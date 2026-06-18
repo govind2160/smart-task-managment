@@ -14,6 +14,8 @@ public class UserDto {
     @Email(message = "Invalid email format")
     private String email;
 
+    private String role; // e.g. ROLE_USER or ROLE_ADMIN
+
     public UserDto() {
     }
 
@@ -21,6 +23,13 @@ public class UserDto {
         this.id = id;
         this.name = name;
         this.email = email;
+    }
+
+    public UserDto(Long id, String name, String email, String role) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.role = role;
     }
 
     // Getters and Setters
@@ -46,5 +55,13 @@ public class UserDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

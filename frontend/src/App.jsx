@@ -30,7 +30,14 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/users" element={<Users />} />
+            <Route 
+              path="/users" 
+              element={
+                <ProtectedRoute adminOnly>
+                  <Users />
+                </ProtectedRoute>
+              } 
+            />
           </Route>
 
           {/* Default Redirection Fallbacks */}

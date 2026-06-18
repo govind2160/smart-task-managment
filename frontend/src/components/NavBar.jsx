@@ -48,15 +48,17 @@ const NavBar = () => {
                   Tasks
                 </NavLink>
               </li>
-              <li>
-                <NavLink 
-                  to="/users" 
-                  className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  Users
-                </NavLink>
-              </li>
+              {user?.role === 'ROLE_ADMIN' && (
+                <li>
+                  <NavLink 
+                    to="/users" 
+                    className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    Users
+                  </NavLink>
+                </li>
+              )}
               {user && (
                 <li className="nav-item" style={{ cursor: 'default', color: 'var(--accent-primary)', background: 'transparent', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   {user.name}

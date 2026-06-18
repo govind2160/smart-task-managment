@@ -54,6 +54,6 @@ public class UserService {
 
     // Mapper helper
     private UserDto convertToDto(User user) {
-        return new UserDto(user.getId(), user.getName(), user.getEmail());
+        return new UserDto(user.getId(), user.getName(), user.getEmail(), user.getRole().name());
     }
 }
