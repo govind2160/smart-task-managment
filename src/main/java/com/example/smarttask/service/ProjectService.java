@@ -3,6 +3,7 @@ package com.example.smarttask.service;
 import com.example.smarttask.dto.ProjectDto;
 import com.example.smarttask.dto.UserDto;
 import com.example.smarttask.entity.Project;
+import com.example.smarttask.entity.Role;
 import com.example.smarttask.entity.User;
 import com.example.smarttask.exception.ResourceNotFoundException;
 import com.example.smarttask.repository.ProjectRepository;
@@ -32,12 +33,19 @@ public class ProjectService {
                 projectDto.getStatus(), 
                 owner
         );
+        project.setDeadline(projectDto.getDeadline());
         Project savedProject = projectRepository.save(project);
         return convertToDto(savedProject);
     }
 
     @Transactional(readOnly = true)
     public List<ProjectDto> getAllProjects(User user) {
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            return projectRepository.findAll()
+                    .stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        }
         return projectRepository.findByMembersId(user.getId())
                 .stream()
                 .map(this::convertToDto)
@@ -45,22 +53,34 @@ public class ProjectService {
     }
 
     public ProjectDto updateProject(Long id, ProjectDto projectDto, User owner) {
-        Project project = projectRepository.findByIdAndOwnerId(id, owner.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id + " for current user"));
+        Project project;
+        if (owner.getRole() == Role.ROLE_ADMIN) {
+            project = projectRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id));
+        } else {
+            project = projectRepository.findByIdAndOwnerId(id, owner.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id + " for current user"));
+        }
 
         project.setName(projectDto.getName());
         project.setDescription(projectDto.getDescription());
         if (projectDto.getStatus() != null) {
             project.setStatus(projectDto.getStatus());
         }
-
+        project.setDeadline(projectDto.getDeadline());
         Project updatedProject = projectRepository.save(project);
         return convertToDto(updatedProject);
     }
 
     public void deleteProject(Long id, User owner) {
-        Project project = projectRepository.findByIdAndOwnerId(id, owner.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id + " for current user"));
+        Project project;
+        if (owner.getRole() == Role.ROLE_ADMIN) {
+            project = projectRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id));
+        } else {
+            project = projectRepository.findByIdAndOwnerId(id, owner.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id + " for current user"));
+        }
         projectRepository.delete(project);
     }
 
@@ -70,7 +90,7 @@ public class ProjectService {
 
         boolean isMember = project.getMembers().stream()
                 .anyMatch(m -> m.getId().equals(user.getId()));
-        if (!isMember) {
+        if (user.getRole() != Role.ROLE_ADMIN && !isMember) {
             throw new IllegalArgumentException("Access denied: You are not a member of this project");
         }
 
@@ -83,7 +103,7 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + projectId));
 
-        if (!project.getOwner().getId().equals(owner.getId())) {
+        if (owner.getRole() != Role.ROLE_ADMIN && !project.getOwner().getId().equals(owner.getId())) {
             throw new IllegalArgumentException("Only the project owner can manage members");
         }
 
@@ -102,7 +122,7 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + projectId));
 
-        if (!project.getOwner().getId().equals(owner.getId())) {
+        if (owner.getRole() != Role.ROLE_ADMIN && !project.getOwner().getId().equals(owner.getId())) {
             throw new IllegalArgumentException("Only the project owner can manage members");
         }
 
@@ -127,7 +147,8 @@ public class ProjectService {
                 project.getStatus(),
                 project.getOwner() != null ? project.getOwner().getId() : null,
                 project.getOwner() != null ? project.getOwner().getName() : null,
-                project.getMembers() != null ? project.getMembers().size() : 0
+                project.getMembers() != null ? project.getMembers().size() : 0,
+                project.getDeadline()
         );
     }
 }

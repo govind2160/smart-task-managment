@@ -10,7 +10,7 @@ const Tasks = () => {
   const [status, setStatus] = useState('PENDING');
   const [projectId, setProjectId] = useState('');
   const [assignedToId, setAssignedToId] = useState('');
-  const [dueDate, setDueDate] = useState('');
+  const [deadline, setDeadline] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -78,7 +78,7 @@ const Tasks = () => {
       status,
       projectId: parseInt(projectId, 10),
       assignedToId: assignedToId ? parseInt(assignedToId, 10) : null,
-      dueDate: dueDate || null
+      deadline: deadline || null
     };
 
     taskApi.createTask(newTask)
@@ -86,7 +86,7 @@ const Tasks = () => {
         setTitle('');
         setStatus('PENDING');
         setAssignedToId('');
-        setDueDate('');
+        setDeadline('');
         fetchData();
       })
       .catch(err => {
@@ -101,7 +101,7 @@ const Tasks = () => {
       status: newStatus,
       projectId: task.projectId,
       assignedToId: task.assignedToId,
-      dueDate: task.dueDate
+      deadline: task.deadline
     };
 
     taskApi.updateTask(task.id, updatedTask)
@@ -164,7 +164,7 @@ const Tasks = () => {
     const priority = getTaskPriority(task.id);
     const membersOfTaskProject = projectMembersMap[task.projectId] || [];
     
-    const isProjectOwner = project && user && project.ownerId === user.id;
+    const isProjectOwner = project && user && (project.ownerId === user.id || user.role === 'ROLE_ADMIN');
     const isAssignee = user && task.assignedToId === user.id;
     const isCreator = user && task.createdById === user.id;
     const canUpdateStatus = isProjectOwner || isAssignee || isCreator;
@@ -179,7 +179,7 @@ const Tasks = () => {
       <div className="kanban-card" key={task.id}>
         <div className="kanban-card-title" style={task.status === 'COMPLETED' ? { textDecoration: 'line-through', color: 'var(--text-muted)' } : {}}>{task.title}</div>
         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-          📁 {project ? project.name : `Project ID: ${task.projectId}`}
+          Project: {project ? project.name : `Project ID: ${task.projectId}`}
         </div>
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '8px' }}>
           <span className={`badge ${priority.className}`}>
@@ -189,13 +189,13 @@ const Tasks = () => {
             by {task.createdByName || 'Unknown'}
           </span>
         </div>
-        {task.dueDate && (
+        {task.deadline && (
           <div style={{ 
             fontSize: '0.725rem', 
-            color: task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date(new Date().setHours(0,0,0,0)) 
+            color: task.status !== 'COMPLETED' && new Date(task.deadline) < new Date(new Date().setHours(0,0,0,0)) 
               ? 'var(--danger)' 
               : 'var(--text-secondary)',
-            fontWeight: task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date(new Date().setHours(0,0,0,0)) 
+            fontWeight: task.status !== 'COMPLETED' && new Date(task.deadline) < new Date(new Date().setHours(0,0,0,0)) 
               ? '600' 
               : 'normal',
             marginBottom: '8px',
@@ -203,8 +203,8 @@ const Tasks = () => {
             alignItems: 'center',
             gap: '4px'
           }}>
-            📅 Due: {task.dueDate} 
-            {task.status !== 'COMPLETED' && new Date(task.dueDate) < new Date(new Date().setHours(0,0,0,0)) && (
+            Due: {task.deadline} 
+            {task.status !== 'COMPLETED' && new Date(task.deadline) < new Date(new Date().setHours(0,0,0,0)) && (
               <span className="badge priority-high" style={{ padding: '1px 4px', fontSize: '0.6rem', marginLeft: '4px' }}>OVERDUE</span>
             )}
           </div>
@@ -219,7 +219,7 @@ const Tasks = () => {
             border: '1px solid var(--border-color)', display: 'inline-flex',
             alignItems: 'center', justifyContent: 'center', fontWeight: 600
           }} title={assignedName}>
-            {task.assignedToId ? initials : '👤'}
+            {task.assignedToId ? initials : '-'}
           </span>
           <select
             style={{ border: 'none', background: 'none', color: 'var(--text-secondary)', fontSize: '0.75rem', padding: 0, cursor: 'pointer', outline: 'none', width: '100%' }}
@@ -269,14 +269,14 @@ const Tasks = () => {
 
       {error && (
         <div className="card" style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)', marginBottom: '24px', padding: '16px' }}>
-          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>⚠️ {error}</p>
+          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>{error}</p>
         </div>
       )}
 
       {projects.length === 0 && !loading && (
         <div className="card" style={{ borderColor: 'var(--warning)', backgroundColor: 'var(--warning-light)', marginBottom: '24px', padding: '16px' }}>
           <p style={{ color: 'var(--warning)', fontWeight: 500, fontSize: '0.875rem' }}>
-            ⚠️ No projects exist! You must create at least one Project before adding Tasks.
+            No projects exist! You must create at least one Project before adding Tasks.
           </p>
         </div>
       )}
@@ -340,12 +340,12 @@ const Tasks = () => {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Due Date</label>
+                <label className="form-label">Deadline</label>
                 <input
                   type="date"
                   className="form-control"
-                  value={dueDate}
-                  onChange={e => setDueDate(e.target.value)}
+                  value={deadline}
+                  onChange={e => setDeadline(e.target.value)}
                   disabled={projects.length === 0}
                 />
               </div>

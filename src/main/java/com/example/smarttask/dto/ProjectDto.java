@@ -19,6 +19,7 @@ public class ProjectDto {
     private Long ownerId;
     private String ownerName;
     private int memberCount;
+    private java.time.LocalDate deadline;
 
     public ProjectDto() {
     }
@@ -30,7 +31,7 @@ public class ProjectDto {
         this.status = status;
     }
 
-    public ProjectDto(Long id, String name, String description, ProjectStatus status, Long ownerId, String ownerName, int memberCount) {
+    public ProjectDto(Long id, String name, String description, ProjectStatus status, Long ownerId, String ownerName, int memberCount, java.time.LocalDate deadline) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -38,6 +39,7 @@ public class ProjectDto {
         this.ownerId = ownerId;
         this.ownerName = ownerName;
         this.memberCount = memberCount;
+        this.deadline = deadline;
     }
 
     // Getters and Setters
@@ -95,5 +97,13 @@ public class ProjectDto {
 
     public void setMemberCount(int memberCount) {
         this.memberCount = memberCount;
+    }
+
+    public java.time.LocalDate getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(java.time.LocalDate deadline) {
+        this.deadline = deadline;
     }
 }

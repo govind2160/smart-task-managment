@@ -29,8 +29,8 @@ public class Task {
     @JoinColumn(name = "created_by_id", nullable = false)
     private User createdBy;
 
-    @Column(name = "due_date")
-    private java.time.LocalDate dueDate;
+    @Column(name = "deadline")
+    private java.time.LocalDate deadline;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
@@ -101,12 +101,12 @@ public class Task {
         this.createdBy = createdBy;
     }
 
-    public java.time.LocalDate getDueDate() {
-        return dueDate;
+    public java.time.LocalDate getDeadline() {
+        return deadline;
     }
 
-    public void setDueDate(java.time.LocalDate dueDate) {
-        this.dueDate = dueDate;
+    public void setDeadline(java.time.LocalDate deadline) {
+        this.deadline = deadline;
     }
 
     public java.time.LocalDateTime getCreatedAt() {

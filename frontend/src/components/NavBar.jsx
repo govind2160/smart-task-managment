@@ -15,7 +15,7 @@ const NavBar = () => {
     <nav className="navbar">
       <div className="nav-container">
         <Link to={isAuthenticated ? "/dashboard" : "/login"} className="nav-logo" style={{ textDecoration: 'none' }}>
-          ✨ SmartTask
+          SmartTask
         </Link>
         
         <ul className="nav-links" style={{ display: 'flex', alignItems: 'center' }}>
@@ -59,7 +59,7 @@ const NavBar = () => {
               </li>
               {user && (
                 <li className="nav-item" style={{ cursor: 'default', color: 'var(--accent-primary)', background: 'transparent', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  👤 {user.name}
+                  {user.name}
                 </li>
               )}
               <li>

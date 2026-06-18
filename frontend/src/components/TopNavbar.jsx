@@ -16,11 +16,6 @@ const TopNavbar = () => {
       <div></div>
       
       <div className="navbar-actions">
-        <button className="notification-bell" title="Notifications" style={{ background: 'none', border: 'none', outline: 'none' }}>
-          🔔
-        </button>
-        
-        <div style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-color)' }}></div>
         
         <div className="user-profile">
           <div className="avatar">

@@ -38,14 +38,14 @@ const Register = () => {
     <div style={{ display: 'flex', minHeight: '100vh', width: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-secondary)', padding: '20px' }}>
       <div className="card" style={{ width: '100%', maxWidth: '440px', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border-color)' }}>
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <span style={{ fontSize: '2rem', display: 'inline-block', marginBottom: '8px' }}>⚡</span>
+
           <h1 style={{ fontSize: '1.5rem', marginBottom: '4px', color: 'var(--primary)' }}>Create an account</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Join the Smart Task Management Workspace</p>
         </div>
 
         {error && (
           <div style={{ padding: '10px 14px', backgroundColor: 'var(--danger-light)', border: '1px solid var(--danger)', borderRadius: '8px', color: 'var(--danger)', fontSize: '0.8125rem', marginBottom: '16px' }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 

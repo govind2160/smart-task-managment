@@ -499,16 +499,7 @@ p.subtitle {
   border-color: var(--accent);
 }
 
-.navbar-search::before {
-  content: "🔍";
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  pointer-events: none;
-}
+
 
 .navbar-actions {
   display: flex;

@@ -21,7 +21,7 @@ public class TaskDto {
     private String assignedToName;
     private Long createdById;
     private String createdByName;
-    private java.time.LocalDate dueDate;
+    private java.time.LocalDate deadline;
     private java.time.LocalDateTime createdAt;
 
     public TaskDto() {
@@ -45,7 +45,7 @@ public class TaskDto {
         this.createdByName = createdByName;
     }
 
-    public TaskDto(Long id, String title, TaskStatus status, Long projectId, Long assignedToId, String assignedToName, Long createdById, String createdByName, java.time.LocalDate dueDate, java.time.LocalDateTime createdAt) {
+    public TaskDto(Long id, String title, TaskStatus status, Long projectId, Long assignedToId, String assignedToName, Long createdById, String createdByName, java.time.LocalDate deadline, java.time.LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.status = status;
@@ -54,7 +54,7 @@ public class TaskDto {
         this.assignedToName = assignedToName;
         this.createdById = createdById;
         this.createdByName = createdByName;
-        this.dueDate = dueDate;
+        this.deadline = deadline;
         this.createdAt = createdAt;
     }
 
@@ -123,12 +123,12 @@ public class TaskDto {
         this.createdByName = createdByName;
     }
 
-    public java.time.LocalDate getDueDate() {
-        return dueDate;
+    public java.time.LocalDate getDeadline() {
+        return deadline;
     }
 
-    public void setDueDate(java.time.LocalDate dueDate) {
-        this.dueDate = dueDate;
+    public void setDeadline(java.time.LocalDate deadline) {
+        this.deadline = deadline;
     }
 
     public java.time.LocalDateTime getCreatedAt() {

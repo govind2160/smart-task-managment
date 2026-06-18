@@ -21,7 +21,7 @@ A collaborative, workspace-centric task management application built with **Spri
 * **Spring Boot 3.3.0** & **Java 17+**
 * **Spring Security & Spring Data JPA**
 * **JWT (JSON Web Tokens)** for stateless authentication
-* **H2 Database** (in-memory, with auto-seeding via `import.sql`)
+* **NeonDB** (serverless PostgreSQL, with auto-seeding via `import.sql`)
 
 ### Frontend
 * **React 18** (Vite-powered)
@@ -48,7 +48,7 @@ A collaborative, workspace-centric task management application built with **Spri
    mvn spring-boot:run
    ```
 3. The server will start on [http://localhost:8080](http://localhost:8080).
-4. The H2 Console is available at [http://localhost:8080/h2-console](http://localhost:8080/h2-console) (JDBC URL: `jdbc:h2:mem:taskdb`, username: `sa`, password: `<blank>`).
+4. Before running, configure the database connection environment variables (e.g. `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`).
 
 ### Run the Frontend
 1. Navigate to the `frontend` folder:
@@ -68,6 +68,24 @@ A collaborative, workspace-centric task management application built with **Spri
 ---
 
 ## 🔑 Seeding / Demo Credentials
-Upon database startup, the following demo users are seeded via `import.sql`:
-1. **John Doe**: `john.doe@example.com` / `password`
-2. **Jane Smith**: `jane.smith@example.com` / `password`
+Upon database startup, if the database is empty, the following demo users are seeded programmatically (password for all is `password`):
+
+### 🛡️ Administrators:
+1. **Amit Sharma**: `amit.sharma@example.com`
+2. **Neha Gupta**: `neha.gupta@example.com`
+
+### 👥 Regular Users:
+1. **Aarav Sharma**: `aarav.sharma@example.com`
+2. **Aditi Patel**: `aditi.patel@example.com`
+3. **Rahul Verma**: `rahul.verma@example.com`
+4. **Priya Iyer**: `priya.iyer@example.com`
+5. **Ishaan Gupta**: `ishaan.gupta@example.com`
+6. **Ananya Sen**: `ananya.sen@example.com`
+7. **Kabir Malhotra**: `kabir.malhotra@example.com`
+8. **Diya Joshi**: `diya.joshi@example.com`
+9. **Arjun Rao**: `arjun.rao@example.com`
+10. **Kavya Nair**: `kavya.nair@example.com`
+11. **Rohan Mehta**: `rohan.mehta@example.com`
+12. **Meera Reddy**: `meera.reddy@example.com`
+13. **Vivaan Saxena**: `vivaan.saxena@example.com`
+14. **Shruti Choudhury**: `shruti.choudhury@example.com`

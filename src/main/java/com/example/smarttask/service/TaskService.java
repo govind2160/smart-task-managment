@@ -2,6 +2,7 @@ package com.example.smarttask.service;
 
 import com.example.smarttask.dto.TaskDto;
 import com.example.smarttask.entity.Project;
+import com.example.smarttask.entity.Role;
 import com.example.smarttask.entity.Task;
 import com.example.smarttask.entity.User;
 import com.example.smarttask.exception.ResourceNotFoundException;
@@ -35,7 +36,7 @@ public class TaskService {
         // Check if creator is a member of the project
         boolean isMember = project.getMembers().stream()
                 .anyMatch(m -> m.getId().equals(creator.getId()));
-        if (!isMember) {
+        if (creator.getRole() != Role.ROLE_ADMIN && !isMember) {
             throw new IllegalArgumentException("Access denied: You are not a member of this project");
         }
 
@@ -53,23 +54,34 @@ public class TaskService {
         }
 
         Task task = new Task(taskDto.getTitle(), taskDto.getStatus(), project, creator, assignee);
-        task.setDueDate(taskDto.getDueDate());
+        task.setDeadline(taskDto.getDeadline());
         Task savedTask = taskRepository.save(task);
         return convertToDto(savedTask);
     }
 
     @Transactional(readOnly = true)
     public List<TaskDto> getAllTasks(User user) {
-        return taskRepository.findByProjectMembersId(user.getId())
-                .stream()
+        List<Task> tasks;
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            tasks = taskRepository.findAll();
+        } else {
+            tasks = taskRepository.findByProjectMembersId(user.getId());
+        }
+        return tasks.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public TaskDto getTaskById(Long id, User user) {
-        Task task = taskRepository.findByIdAndProjectMembersId(id, user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id + " or access denied"));
+        Task task;
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            task = taskRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+        } else {
+            task = taskRepository.findByIdAndProjectMembersId(id, user.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id + " or access denied"));
+        }
         return convertToDto(task);
     }
 
@@ -78,13 +90,14 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
 
         Project project = task.getProject();
-        boolean isMember = project.getMembers().stream()
+        boolean isAdmin = user.getRole() == Role.ROLE_ADMIN;
+        boolean isMember = isAdmin || project.getMembers().stream()
                 .anyMatch(m -> m.getId().equals(user.getId()));
         if (!isMember) {
             throw new IllegalArgumentException("Access denied: You are not a member of this project");
         }
 
-        boolean isOwner = project.getOwner().getId().equals(user.getId());
+        boolean isOwner = isAdmin || project.getOwner().getId().equals(user.getId());
         boolean isAssignee = task.getAssignedTo() != null && task.getAssignedTo().getId().equals(user.getId());
         boolean isCreator = task.getCreatedBy() != null && task.getCreatedBy().getId().equals(user.getId());
 
@@ -98,13 +111,13 @@ public class TaskService {
             // Owner can update everything
             task.setTitle(taskDto.getTitle());
             task.setStatus(taskDto.getStatus());
-            task.setDueDate(taskDto.getDueDate());
+            task.setDeadline(taskDto.getDeadline());
 
             if (taskDto.getProjectId() != null && !taskDto.getProjectId().equals(project.getId())) {
                 Project newProject = projectRepository.findById(taskDto.getProjectId())
                         .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + taskDto.getProjectId()));
                 // Verify owner is also owner/member of the new project
-                boolean isNewMember = newProject.getMembers().stream()
+                boolean isNewMember = isAdmin || newProject.getMembers().stream()
                         .anyMatch(m -> m.getId().equals(user.getId()));
                 if (!isNewMember) {
                     throw new IllegalArgumentException("Cannot move task to a project you don't belong to");
@@ -136,7 +149,7 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
 
         Project project = task.getProject();
-        if (!project.getOwner().getId().equals(user.getId())) {
+        if (user.getRole() != Role.ROLE_ADMIN && !project.getOwner().getId().equals(user.getId())) {
             throw new IllegalArgumentException("Only the project owner can delete tasks");
         }
 
@@ -148,7 +161,7 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
 
         Project project = task.getProject();
-        boolean isMember = project.getMembers().stream()
+        boolean isMember = user.getRole() == Role.ROLE_ADMIN || project.getMembers().stream()
                 .anyMatch(m -> m.getId().equals(user.getId()));
         if (!isMember) {
             throw new IllegalArgumentException("Access denied: You are not a member of this project");
@@ -189,7 +202,7 @@ public class TaskService {
                 task.getAssignedTo() != null ? task.getAssignedTo().getName() : null,
                 task.getCreatedBy() != null ? task.getCreatedBy().getId() : null,
                 task.getCreatedBy() != null ? task.getCreatedBy().getName() : null,
-                task.getDueDate(),
+                task.getDeadline(),
                 task.getCreatedAt()
         );
     }

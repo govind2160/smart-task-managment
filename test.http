@@ -32,8 +32,3 @@ GET http://localhost:8080/projects
 # Replace the token below with the token received from step 2
 GET http://localhost:8080/projects
 Authorization: Bearer <paste_token_here>
-
-###
-
-### 5. Access H2 Console (Should be accessible/allowed)
-GET http://localhost:8080/h2-console

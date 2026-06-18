@@ -8,7 +8,7 @@ const Sidebar = () => {
   return (
     <aside className="app-sidebar">
       <div className="sidebar-logo">
-        <span style={{ fontSize: '1.25rem' }}>⚡</span>
+
         <span style={{ fontWeight: 700, letterSpacing: '-0.025em' }}>SmartTask</span>
       </div>
       
@@ -17,7 +17,7 @@ const Sidebar = () => {
           to="/dashboard" 
           className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
         >
-          <span style={{ fontSize: '1.1rem' }}>📊</span>
+
           <span>Dashboard</span>
         </NavLink>
         
@@ -25,7 +25,7 @@ const Sidebar = () => {
           to="/projects" 
           className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
         >
-          <span style={{ fontSize: '1.1rem' }}>📂</span>
+
           <span>Projects</span>
         </NavLink>
         
@@ -33,7 +33,7 @@ const Sidebar = () => {
           to="/tasks" 
           className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
         >
-          <span style={{ fontSize: '1.1rem' }}>☑️</span>
+
           <span>Tasks</span>
         </NavLink>
         
@@ -41,7 +41,7 @@ const Sidebar = () => {
           to="/users" 
           className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
         >
-          <span style={{ fontSize: '1.1rem' }}>👥</span>
+
           <span>Users</span>
         </NavLink>
       </nav>

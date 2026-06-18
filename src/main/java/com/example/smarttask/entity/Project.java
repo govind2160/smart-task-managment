@@ -27,6 +27,9 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
 
+    @Column(name = "deadline")
+    private java.time.LocalDate deadline;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
@@ -111,5 +114,13 @@ public class Project {
 
     public void setMembers(Set<User> members) {
         this.members = members;
+    }
+
+    public java.time.LocalDate getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(java.time.LocalDate deadline) {
+        this.deadline = deadline;
     }
 }

@@ -92,10 +92,10 @@ const Dashboard = () => {
       return false;
     }
     // 3. Date Range Filters (by Task Due Date)
-    if (startDate && (!task.dueDate || task.dueDate < startDate)) {
+    if (startDate && (!task.deadline || task.deadline < startDate)) {
       return false;
     }
-    if (endDate && (!task.dueDate || task.dueDate > endDate)) {
+    if (endDate && (!task.deadline || task.deadline > endDate)) {
       return false;
     }
     return true;
@@ -111,8 +111,8 @@ const Dashboard = () => {
   const todayStr = new Date().toISOString().split('T')[0];
   const overdueTasks = filteredTasks.filter(t => 
     t.status !== 'COMPLETED' && 
-    t.dueDate && 
-    t.dueDate < todayStr
+    t.deadline && 
+    t.deadline < todayStr
   ).length;
 
   const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
@@ -169,13 +169,13 @@ const Dashboard = () => {
           <p className="subtitle">Track project progress, task completions, and team performance metrics</p>
         </div>
         <button className="btn btn-secondary" onClick={fetchData} style={{ height: '38px', marginBottom: '24px' }}>
-          🔄 Refresh Data
+          Refresh Data
         </button>
       </div>
 
       {error && (
         <div className="card" style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)', marginBottom: '24px', padding: '16px' }}>
-          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>⚠️ {error}</p>
+          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>{error}</p>
         </div>
       )}
 
@@ -183,7 +183,7 @@ const Dashboard = () => {
       <div className="card" style={{ marginBottom: '32px', padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
           <h3 style={{ fontSize: '0.925rem', fontWeight: 600, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            🔍 Dynamic Filters
+            Dynamic Filters
           </h3>
           {(selectedProject !== 'all' || selectedAssignee !== 'all' || startDate || endDate) && (
             <button className="btn btn-danger-outline" onClick={handleClearFilters} style={{ padding: '4px 10px', fontSize: '0.75rem', height: '26px' }}>
@@ -246,14 +246,14 @@ const Dashboard = () => {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', fontSize: '0.825rem' }}>
           <span style={{ color: 'var(--text-secondary)' }}>
-            📊 <strong>{completedTasks}</strong> of <strong>{totalTasks}</strong> tasks completed
+            <strong>{completedTasks}</strong> of <strong>{totalTasks}</strong> tasks completed
           </span>
           {overdueTasks > 0 ? (
             <span style={{ color: 'var(--danger)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              ⚠️ {overdueTasks} Overdue Task{overdueTasks > 1 ? 's' : ''}
+              {overdueTasks} Overdue Task{overdueTasks > 1 ? 's' : ''}
             </span>
           ) : (
-            <span style={{ color: 'var(--success)' }}>✔ No overdue tasks</span>
+            <span style={{ color: 'var(--success)' }}>No overdue tasks</span>
           )}
         </div>
       </div>
@@ -416,7 +416,7 @@ const Dashboard = () => {
                   if (task.status === 'COMPLETED') badgeColorClass = 'status-completed';
                   else if (task.status === 'IN_PROGRESS') badgeColorClass = 'status-active';
 
-                  const isOverdue = task.status !== 'COMPLETED' && task.dueDate && task.dueDate < todayStr;
+                  const isOverdue = task.status !== 'COMPLETED' && task.deadline && task.deadline < todayStr;
 
                   return (
                     <div key={task.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', fontSize: '0.78rem' }}>
@@ -425,11 +425,11 @@ const Dashboard = () => {
                           {task.title}
                         </span>
                         <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
-                          👤 {task.assignedToName || 'Unassigned'}
+                          {task.assignedToName || 'Unassigned'}
                         </span>
                       </div>
                       
-                      {task.dueDate && (
+                      {task.deadline && (
                         <span style={{ 
                           fontSize: '0.68rem', 
                           color: isOverdue ? 'var(--danger)' : 'var(--text-secondary)', 
@@ -439,7 +439,7 @@ const Dashboard = () => {
                           borderRadius: isOverdue ? '4px' : '0',
                           whiteSpace: 'nowrap'
                         }}>
-                          📅 {task.dueDate}
+                          Due: {task.deadline}
                         </span>
                       )}
 

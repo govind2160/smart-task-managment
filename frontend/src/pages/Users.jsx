@@ -50,7 +50,7 @@ const Users = () => {
 
       {error && (
         <div className="card" style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)', marginBottom: '24px', padding: '16px' }}>
-          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>⚠️ {error}</p>
+          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>{error}</p>
         </div>
       )}
 

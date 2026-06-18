@@ -8,6 +8,7 @@ const Projects = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('PLANNED');
+  const [deadline, setDeadline] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,13 +45,14 @@ const Projects = () => {
     e.preventDefault();
     if (!name) return;
 
-    const newProject = { name, description, status };
+    const newProject = { name, description, status, deadline: deadline || null };
 
     projectApi.createProject(newProject)
       .then(() => {
         setName('');
         setDescription('');
         setStatus('PLANNED');
+        setDeadline('');
         fetchProjects();
       })
       .catch(err => {
@@ -136,7 +138,7 @@ const Projects = () => {
 
       {error && (
         <div className="card" style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)', marginBottom: '24px', padding: '16px' }}>
-          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>⚠️ {error}</p>
+          <p style={{ color: 'var(--danger)', fontWeight: 500, fontSize: '0.875rem' }}>{error}</p>
         </div>
       )}
 
@@ -180,6 +182,15 @@ const Projects = () => {
                   <option value="COMPLETED">Completed</option>
                 </select>
               </div>
+              <div className="form-group">
+                <label className="form-label">Deadline</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={deadline}
+                  onChange={e => setDeadline(e.target.value)}
+                />
+              </div>
               <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '40px', marginTop: '8px' }}>
                 Add Project
               </button>
@@ -212,13 +223,14 @@ const Projects = () => {
                   <thead>
                     <tr>
                       <th>Project</th>
+                      <th>Deadline</th>
                       <th>Status</th>
                       <th style={{ textAlign: 'right' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredProjects.map(proj => {
-                      const isOwner = user && user.id === proj.ownerId;
+                      const isOwner = user && (user.id === proj.ownerId || user.role === 'ROLE_ADMIN');
                       return (
                         <tr key={proj.id}>
                           <td>
@@ -240,12 +252,17 @@ const Projects = () => {
                                 </span>
                               )}
                               <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                👥 {proj.memberCount || 1} member{proj.memberCount !== 1 ? 's' : ''}
+                                {proj.memberCount || 1} member{proj.memberCount !== 1 ? 's' : ''}
                               </span>
                             </div>
                             <div style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', marginTop: '4px', lineHeight: '1.4' }}>
                               {proj.description || 'No description provided.'}
                             </div>
+                          </td>
+                          <td>
+                            <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                              {proj.deadline ? proj.deadline : 'None'}
+                            </span>
                           </td>
                           <td>
                             <span className={`badge ${getStatusBadgeClass(proj.status)}`}>
