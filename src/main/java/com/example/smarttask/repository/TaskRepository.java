@@ -29,6 +29,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByAssignedToId(Long userId);
 
+    @Query("SELECT t FROM Task t WHERE t.createdBy.id = :userId")
+    List<Task> findByCreatedById(@Param("userId") Long userId);
+
     long countByAssignedToId(Long userId);
 
     long countByStatusAndAssignedToId(TaskStatus status, Long userId);

@@ -1,8 +1,12 @@
 package com.example.smarttask.service;
 
 import com.example.smarttask.dto.UserDto;
+import com.example.smarttask.entity.Project;
+import com.example.smarttask.entity.Task;
 import com.example.smarttask.entity.User;
 import com.example.smarttask.exception.ResourceNotFoundException;
+import com.example.smarttask.repository.ProjectRepository;
+import com.example.smarttask.repository.TaskRepository;
 import com.example.smarttask.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +19,17 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final TaskRepository taskRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(
+            UserRepository userRepository,
+            ProjectRepository projectRepository,
+            TaskRepository taskRepository
+    ) {
         this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
+        this.taskRepository = taskRepository;
     }
 
     public UserDto createUser(UserDto userDto) {
@@ -46,10 +58,37 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // 1. Unassign tasks assigned to this user
+        List<Task> assignedTasks = taskRepository.findByAssignedToId(id);
+        for (Task task : assignedTasks) {
+            task.setAssignedTo(null);
+            taskRepository.save(task);
         }
-        userRepository.deleteById(id);
+
+        // 2. Delete tasks created by this user
+        List<Task> createdTasks = taskRepository.findByCreatedById(id);
+        for (Task task : createdTasks) {
+            taskRepository.delete(task);
+        }
+
+        // 3. Remove user from all projects where they are a member
+        List<Project> memberProjects = projectRepository.findByMembersId(id);
+        for (Project project : memberProjects) {
+            project.getMembers().remove(user);
+            projectRepository.save(project);
+        }
+
+        // 4. Delete projects owned by this user
+        List<Project> ownedProjects = projectRepository.findByOwnerId(id);
+        for (Project project : ownedProjects) {
+            projectRepository.delete(project);
+        }
+
+        // 5. Delete the user
+        userRepository.delete(user);
     }
 
     // Mapper helper
