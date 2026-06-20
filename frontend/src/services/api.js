@@ -6,7 +6,21 @@ class ApiError extends Error {
   }
 }
 
-const BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8080' : '');
+const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_URL;
+  if (url) {
+    if (url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+    if (!url.endsWith('/api')) {
+      url += '/api';
+    }
+    return url;
+  }
+  return import.meta.env.DEV ? 'http://localhost:8080/api' : '/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 const request = async (url, options = {}) => {
   const token = localStorage.getItem('token');
