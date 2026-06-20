@@ -47,14 +47,14 @@ public class AuthService {
         Role userRole = Role.ROLE_USER;
         if (request.getRole() != null) {
             try {
-                // Clean input and try to parse
+
                 String cleanRole = request.getRole().trim().toUpperCase();
                 if (!cleanRole.startsWith("ROLE_")) {
                     cleanRole = "ROLE_" + cleanRole;
                 }
                 userRole = Role.valueOf(cleanRole);
             } catch (IllegalArgumentException e) {
-                // Keep default ROLE_USER
+
             }
         }
 

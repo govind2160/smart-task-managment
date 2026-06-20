@@ -3,6 +3,8 @@ package com.example.smarttask.dto;
 import com.example.smarttask.entity.ProjectStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.FutureOrPresent;
+import java.time.LocalDate;
 
 public class ProjectDto {
 
@@ -11,15 +13,19 @@ public class ProjectDto {
     @NotBlank(message = "Project name is required")
     private String name;
 
+    @NotBlank(message = "Project description is required")
     private String description;
 
     @NotNull(message = "Project status is required")
     private ProjectStatus status;
 
+    @NotNull(message = "Deadline is required")
+    @FutureOrPresent(message = "Deadline cannot be in the past")
+    private LocalDate deadline;
+
     private Long ownerId;
     private String ownerName;
     private int memberCount;
-    private java.time.LocalDate deadline;
 
     public ProjectDto() {
     }
@@ -31,7 +37,7 @@ public class ProjectDto {
         this.status = status;
     }
 
-    public ProjectDto(Long id, String name, String description, ProjectStatus status, Long ownerId, String ownerName, int memberCount, java.time.LocalDate deadline) {
+    public ProjectDto(Long id, String name, String description, ProjectStatus status, Long ownerId, String ownerName, int memberCount, LocalDate deadline) {
         this.id = id;
         this.name = name;
         this.description = description;

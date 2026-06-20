@@ -7,12 +7,14 @@ const Tasks = () => {
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [status, setStatus] = useState('PENDING');
   const [projectId, setProjectId] = useState('');
   const [assignedToId, setAssignedToId] = useState('');
   const [deadline, setDeadline] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [formError, setFormError] = useState(null);
   
   // Track project members to allow assignee options
   const [projectMembersMap, setProjectMembersMap] = useState({});
@@ -71,10 +73,42 @@ const Tasks = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title || !projectId) return;
+    setFormError(null);
+
+    // Validation
+    if (!title.trim()) {
+      setFormError('Task title is required');
+      return;
+    }
+
+    if (!description.trim()) {
+      setFormError('Task description is required');
+      return;
+    }
+
+    if (!projectId) {
+      setFormError('Please select a project');
+      return;
+    }
+
+    if (!deadline) {
+      setFormError('Deadline is required');
+      return;
+    }
+
+    // Check if deadline is in the past
+    const selectedDate = new Date(deadline);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      setFormError('Deadline cannot be in the past');
+      return;
+    }
 
     const newTask = {
       title,
+      description,
       status,
       projectId: parseInt(projectId, 10),
       assignedToId: assignedToId ? parseInt(assignedToId, 10) : null,
@@ -84,14 +118,16 @@ const Tasks = () => {
     taskApi.createTask(newTask)
       .then(() => {
         setTitle('');
+        setDescription('');
         setStatus('PENDING');
         setAssignedToId('');
         setDeadline('');
+        setFormError(null);
         fetchData();
       })
       .catch(err => {
         console.error('Error creating task:', err);
-        alert('Failed to create task: ' + (err.response?.data?.message || err.message));
+        setFormError(err.response?.data?.message || 'Failed to create task: ' + err.message);
       });
   };
 
@@ -145,10 +181,11 @@ const Tasks = () => {
       });
   };
 
-  const getTaskPriority = (id) => {
-    if (!id) return { label: 'LOW', className: 'priority-low' };
-    if (id % 3 === 0) return { label: 'HIGH', className: 'priority-high' };
-    if (id % 2 === 0) return { label: 'MEDIUM', className: 'priority-medium' };
+  const getTaskPriority = (priority) => {
+    if (!priority) return { label: 'LOW', className: 'priority-low' };
+    const p = priority.toUpperCase();
+    if (p === 'HIGH') return { label: 'HIGH', className: 'priority-high' };
+    if (p === 'MEDIUM') return { label: 'MEDIUM', className: 'priority-medium' };
     return { label: 'LOW', className: 'priority-low' };
   };
 
@@ -161,7 +198,7 @@ const Tasks = () => {
 
   const renderTaskCard = (task) => {
     const project = projects.find(p => p.id === task.projectId);
-    const priority = getTaskPriority(task.id);
+    const priority = getTaskPriority(task.priority);
     const membersOfTaskProject = projectMembersMap[task.projectId] || [];
     
     const isProjectOwner = project && user && (project.ownerId === user.id || user.role === 'ROLE_ADMIN');
@@ -286,6 +323,11 @@ const Tasks = () => {
         <div>
           <div className="card" style={{ position: 'sticky', top: '102px' }}>
             <h2 style={{ fontSize: '1rem', marginBottom: '20px' }}>Create Task</h2>
+            {formError && (
+              <div style={{ padding: '10px 14px', backgroundColor: 'var(--danger-light)', border: '1px solid var(--danger)', borderRadius: '8px', color: 'var(--danger)', fontSize: '0.8125rem', marginBottom: '16px' }}>
+                {formError}
+              </div>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label">Task Title</label>
@@ -296,6 +338,18 @@ const Tasks = () => {
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   disabled={projects.length === 0}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Task Description</label>
+                <textarea
+                  className="form-control"
+                  placeholder="e.g. Create UML diagrams and entity relationships"
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  disabled={projects.length === 0}
+                  rows="3"
                   required
                 />
               </div>
@@ -347,6 +401,8 @@ const Tasks = () => {
                   value={deadline}
                   onChange={e => setDeadline(e.target.value)}
                   disabled={projects.length === 0}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
                 />
               </div>
               <button 

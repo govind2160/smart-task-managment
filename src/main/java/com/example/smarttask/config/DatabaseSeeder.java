@@ -62,27 +62,27 @@ public class DatabaseSeeder implements CommandLineRunner {
             handloomStore = projectRepository.save(handloomStore);
 
             // Seed Tasks (6 tasks total)
-            Task task1 = new Task("Organize Local Volunteer Drive", TaskStatus.COMPLETED, swachhBharat, aarav, aditi);
+            Task task1 = new Task("Organize Local Volunteer Drive", "Coordinate with local authorities to organize community volunteer cleanup drive in 5 districts", TaskStatus.COMPLETED, swachhBharat, aarav, aditi);
             task1.setDeadline(LocalDate.parse("2026-06-12"));
             task1.setCreatedAt(LocalDateTime.of(2026, 6, 8, 9, 0, 0));
 
-            Task task2 = new Task("Translate UI to Hindi and Tamil", TaskStatus.IN_PROGRESS, farmerApp, rahul, priya);
+            Task task2 = new Task("Translate UI to Hindi and Tamil", "Complete translation of all UI elements and documentation to regional Indian languages", TaskStatus.IN_PROGRESS, farmerApp, rahul, priya);
             task2.setDeadline(LocalDate.parse("2026-07-05"));
             task2.setCreatedAt(LocalDateTime.of(2026, 6, 12, 10, 0, 0));
 
-            Task task3 = new Task("Optimize Pathfinding Algorithms", TaskStatus.PENDING, roverSim, amit, aarav);
+            Task task3 = new Task("Optimize Pathfinding Algorithms", "Improve rover navigation efficiency and reduce computational overhead", TaskStatus.PENDING, roverSim, amit, aarav);
             task3.setDeadline(LocalDate.parse("2026-07-20"));
             task3.setCreatedAt(LocalDateTime.of(2026, 6, 15, 14, 30, 0));
 
-            Task task4 = new Task("Onboard Weaver Cooperatives", TaskStatus.IN_PROGRESS, handloomStore, priya, rahul);
+            Task task4 = new Task("Onboard Weaver Cooperatives", "Register and integrate cooperative groups from different regions", TaskStatus.IN_PROGRESS, handloomStore, priya, rahul);
             task4.setDeadline(LocalDate.parse("2026-06-30"));
             task4.setCreatedAt(LocalDateTime.of(2026, 6, 10, 11, 0, 0));
 
-            Task task5 = new Task("Design Crop Selling Interface", TaskStatus.COMPLETED, farmerApp, rahul, rahul);
+            Task task5 = new Task("Design Crop Selling Interface", "Create intuitive UI for farmers to list and sell crops directly", TaskStatus.COMPLETED, farmerApp, rahul, rahul);
             task5.setDeadline(LocalDate.parse("2026-06-18"));
             task5.setCreatedAt(LocalDateTime.of(2026, 6, 10, 15, 0, 0));
 
-            Task task6 = new Task("Procure waste collection equipment", TaskStatus.PENDING, swachhBharat, aarav, aarav);
+            Task task6 = new Task("Procure waste collection equipment", "Source and purchase bins, trucks, and equipment for waste management", TaskStatus.PENDING, swachhBharat, aarav, aarav);
             task6.setDeadline(LocalDate.parse("2026-06-24"));
             task6.setCreatedAt(LocalDateTime.of(2026, 6, 11, 16, 0, 0));
 

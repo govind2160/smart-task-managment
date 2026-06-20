@@ -13,6 +13,9 @@ public class Task {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false, columnDefinition = "TEXT DEFAULT ''")
+    private String description;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status = TaskStatus.PENDING;
@@ -38,14 +41,16 @@ public class Task {
     public Task() {
     }
 
-    public Task(String title, TaskStatus status, Project project) {
+    public Task(String title, String description, TaskStatus status, Project project) {
         this.title = title;
+        this.description = description;
         this.status = (status != null) ? status : TaskStatus.PENDING;
         this.project = project;
     }
 
-    public Task(String title, TaskStatus status, Project project, User createdBy, User assignedTo) {
+    public Task(String title, String description, TaskStatus status, Project project, User createdBy, User assignedTo) {
         this.title = title;
+        this.description = description;
         this.status = (status != null) ? status : TaskStatus.PENDING;
         this.project = project;
         this.createdBy = createdBy;
@@ -53,6 +58,20 @@ public class Task {
     }
 
     // Getters and Setters
+    public TaskPriority getPriority() {
+        if (this.deadline == null) {
+            return TaskPriority.LOW;
+        }
+        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), this.deadline);
+        if (daysBetween <= 15) {
+            return TaskPriority.HIGH;
+        } else if (daysBetween <= 30) {
+            return TaskPriority.MEDIUM;
+        } else {
+            return TaskPriority.LOW;
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -67,6 +86,14 @@ public class Task {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public TaskStatus getStatus() {

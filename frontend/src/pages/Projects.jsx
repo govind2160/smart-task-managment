@@ -12,6 +12,7 @@ const Projects = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [formError, setFormError] = useState(null);
 
   // Members management state
   const [managingProjectId, setManagingProjectId] = useState(null);
@@ -43,7 +44,33 @@ const Projects = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name) return;
+    setFormError(null);
+
+    // Validation
+    if (!name.trim()) {
+      setFormError('Project name is required');
+      return;
+    }
+
+    if (!description.trim()) {
+      setFormError('Project description is required');
+      return;
+    }
+
+    if (!deadline) {
+      setFormError('Deadline is required');
+      return;
+    }
+
+    // Check if deadline is in the past
+    const selectedDate = new Date(deadline);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      setFormError('Deadline cannot be in the past');
+      return;
+    }
 
     const newProject = { name, description, status, deadline: deadline || null };
 
@@ -53,11 +80,12 @@ const Projects = () => {
         setDescription('');
         setStatus('PLANNED');
         setDeadline('');
+        setFormError(null);
         fetchProjects();
       })
       .catch(err => {
         console.error('Error creating project:', err);
-        alert('Failed to create project: ' + (err.response?.data?.message || err.message));
+        setFormError(err.response?.data?.message || 'Failed to create project: ' + err.message);
       });
   };
 
@@ -147,6 +175,11 @@ const Projects = () => {
         <div>
           <div className="card" style={{ position: 'sticky', top: '102px' }}>
             <h2 style={{ fontSize: '1rem', marginBottom: '20px' }}>Create Project</h2>
+            {formError && (
+              <div style={{ padding: '10px 14px', backgroundColor: 'var(--danger-light)', border: '1px solid var(--danger)', borderRadius: '8px', color: 'var(--danger)', fontSize: '0.8125rem', marginBottom: '16px' }}>
+                {formError}
+              </div>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label">Project Name</label>
@@ -168,6 +201,7 @@ const Projects = () => {
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   style={{ resize: 'vertical' }}
+                  required
                 />
               </div>
               <div className="form-group">
@@ -189,6 +223,8 @@ const Projects = () => {
                   className="form-control"
                   value={deadline}
                   onChange={e => setDeadline(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
                 />
               </div>
               <button type="submit" className="btn btn-primary" style={{ width: '100%', height: '40px', marginTop: '8px' }}>

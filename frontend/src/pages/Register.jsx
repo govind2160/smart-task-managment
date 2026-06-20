@@ -15,21 +15,47 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      setLoading(false);
+    // Validation
+    if (!name.trim()) {
+      setError('Full name is required');
       return;
     }
 
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (!password.trim()) {
+      setError('Password is required');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
+    if (!passwordRegex.test(password)) {
+      setError('Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@$!%*?&)');
+      return;
+    }
+
+    setLoading(true);
     try {
       await register(name, email, password, role);
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Registration error:', err);
       setError(err.response?.data?.message || err.message || 'Registration failed.');
-    } finally {
       setLoading(false);
     }
   };

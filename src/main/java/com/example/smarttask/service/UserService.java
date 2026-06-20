@@ -8,6 +8,7 @@ import com.example.smarttask.exception.ResourceNotFoundException;
 import com.example.smarttask.repository.ProjectRepository;
 import com.example.smarttask.repository.TaskRepository;
 import com.example.smarttask.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,15 +22,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository userRepository,
             ProjectRepository projectRepository,
-            TaskRepository taskRepository
+            TaskRepository taskRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserDto createUser(UserDto userDto) {
@@ -37,7 +41,12 @@ public class UserService {
             throw new IllegalArgumentException("Email is already in use: " + userDto.getEmail());
         }
 
-        User user = new User(userDto.getName(), userDto.getEmail());
+        User user = new User(
+                userDto.getName(),
+                userDto.getEmail(),
+                passwordEncoder.encode(userDto.getPassword()),
+                null
+        );
         User savedUser = userRepository.save(user);
         return convertToDto(savedUser);
     }

@@ -53,7 +53,7 @@ public class TaskService {
             }
         }
 
-        Task task = new Task(taskDto.getTitle(), taskDto.getStatus(), project, creator, assignee);
+        Task task = new Task(taskDto.getTitle(), taskDto.getDescription(), taskDto.getStatus(), project, creator, assignee);
         task.setDeadline(taskDto.getDeadline());
         Task savedTask = taskRepository.save(task);
         return convertToDto(savedTask);
@@ -110,6 +110,7 @@ public class TaskService {
         } else {
             // Owner can update everything
             task.setTitle(taskDto.getTitle());
+            task.setDescription(taskDto.getDescription());
             task.setStatus(taskDto.getStatus());
             task.setDeadline(taskDto.getDeadline());
 
@@ -194,9 +195,10 @@ public class TaskService {
 
     // Mapper helper
     private TaskDto convertToDto(Task task) {
-        return new TaskDto(
+        TaskDto dto = new TaskDto(
                 task.getId(),
                 task.getTitle(),
+                task.getDescription(),
                 task.getStatus(),
                 task.getProject().getId(),
                 task.getAssignedTo() != null ? task.getAssignedTo().getId() : null,
@@ -206,5 +208,7 @@ public class TaskService {
                 task.getDeadline(),
                 task.getCreatedAt()
         );
+        dto.setPriority(task.getPriority());
+        return dto;
     }
 }

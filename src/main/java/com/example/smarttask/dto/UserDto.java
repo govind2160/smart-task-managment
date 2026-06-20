@@ -16,6 +16,9 @@ public class UserDto {
 
     private String role; // e.g. ROLE_USER or ROLE_ADMIN
 
+    @NotBlank(message = "Password is required")
+    private String password;
+
     public UserDto() {
     }
 
@@ -29,6 +32,14 @@ public class UserDto {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.role = role;
+    }
+
+    public UserDto(Long id, String name, String email, String password, String role) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
         this.role = role;
     }
 
@@ -63,5 +74,13 @@ public class UserDto {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

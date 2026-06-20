@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password, role = 'ROLE_USER') => {
-    setLoading(true);
     try {
       const response = await authApi.register({ name, email, password, role });
       const { id, token: jwt, email: userEmail, name: userName, role: userRole } = response.data;
@@ -66,6 +65,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user_name', userName || name);
       localStorage.setItem('user_role', userRole || role);
 
+      // Update state immediately without loading state
       setUser({ 
         id,
         email: userEmail || email, 
@@ -73,10 +73,8 @@ export const AuthProvider = ({ children }) => {
         role: userRole || role 
       });
       setToken(jwt);
-      setLoading(false);
       return response.data;
     } catch (error) {
-      setLoading(false);
       throw error;
     }
   };

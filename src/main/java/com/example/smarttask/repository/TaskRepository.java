@@ -3,6 +3,7 @@ package com.example.smarttask.repository;
 import com.example.smarttask.entity.Task;
 import com.example.smarttask.entity.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,23 +13,37 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
+    @Override
+    @EntityGraph(attributePaths = {"assignedTo", "createdBy", "project"})
+    List<Task> findAll();
+
+    @Override
+    @EntityGraph(attributePaths = {"assignedTo", "createdBy", "project"})
+    Optional<Task> findById(Long id);
+
+    @EntityGraph(attributePaths = {"assignedTo", "createdBy", "project"})
     List<Task> findByProjectId(Long projectId);
+
     long countByStatus(TaskStatus status);
 
     @Query("SELECT t FROM Task t JOIN t.project.members m WHERE m.id = :userId")
     List<Task> findByProjectMembersId(@Param("userId") Long userId);
 
+    @EntityGraph(attributePaths = {"assignedTo", "createdBy", "project"})
     @Query("SELECT DISTINCT t FROM Task t LEFT JOIN t.project.members m WHERE t.project.owner.id = :userId OR m.id = :userId")
     List<Task> findByProjectOwnerIdOrMembersId(@Param("userId") Long userId);
 
     @Query("SELECT t FROM Task t JOIN t.project.members m WHERE t.id = :taskId AND m.id = :userId")
     Optional<Task> findByIdAndProjectMembersId(@Param("taskId") Long taskId, @Param("userId") Long userId);
 
+    @EntityGraph(attributePaths = {"assignedTo", "createdBy", "project"})
     @Query("SELECT t FROM Task t LEFT JOIN t.project.members m WHERE t.id = :taskId AND (t.project.owner.id = :userId OR m.id = :userId)")
     Optional<Task> findByIdAndProjectOwnerIdOrMembersId(@Param("taskId") Long taskId, @Param("userId") Long userId);
 
+    @EntityGraph(attributePaths = {"assignedTo", "createdBy", "project"})
     List<Task> findByAssignedToId(Long userId);
 
+    @EntityGraph(attributePaths = {"assignedTo", "createdBy", "project"})
     @Query("SELECT t FROM Task t WHERE t.createdBy.id = :userId")
     List<Task> findByCreatedById(@Param("userId") Long userId);
 
