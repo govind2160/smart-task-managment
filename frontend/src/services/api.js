@@ -6,7 +6,7 @@ class ApiError extends Error {
   }
 }
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const request = async (url, options = {}) => {
   const token = localStorage.getItem('token');
