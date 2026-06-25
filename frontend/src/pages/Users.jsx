@@ -25,8 +25,6 @@ const Users = () => {
   }, []);
 
   const handleDelete = (id) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
-
     userApi.deleteUser(id)
       .then(() => {
         fetchUsers();
