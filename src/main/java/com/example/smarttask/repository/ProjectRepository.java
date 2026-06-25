@@ -28,16 +28,13 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     long countByOwnerId(Long ownerId);
 
-    @EntityGraph(attributePaths = {"owner", "members"})
-    @Query("SELECT DISTINCT p FROM Project p JOIN p.members m WHERE m.id = :userId")
+    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.owner LEFT JOIN FETCH p.members WHERE :userId MEMBER OF p.members")
     List<Project> findByMembersId(@Param("userId") Long userId);
 
-    @EntityGraph(attributePaths = {"owner", "members"})
-    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN p.members m WHERE p.owner.id = :userId OR m.id = :userId")
+    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.owner LEFT JOIN FETCH p.members WHERE p.owner.id = :userId OR :userId MEMBER OF p.members")
     List<Project> findByOwnerIdOrMembersId(@Param("userId") Long userId);
 
-    @EntityGraph(attributePaths = {"owner", "members"})
-    @Query("SELECT p FROM Project p JOIN p.members m WHERE p.id = :projectId AND m.id = :userId")
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.owner LEFT JOIN FETCH p.members WHERE p.id = :projectId AND :userId MEMBER OF p.members")
     Optional<Project> findByIdAndMembersId(@Param("projectId") Long projectId, @Param("userId") Long userId);
 
     @Query("SELECT COUNT(p) FROM Project p JOIN p.members m WHERE m.id = :userId AND p.owner.id != :userId")
