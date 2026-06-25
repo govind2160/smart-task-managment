@@ -90,8 +90,6 @@ const Projects = () => {
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm('Are you sure you want to delete this project? This will delete all associated tasks!')) return;
-
     projectApi.deleteProject(id)
       .then(() => {
         fetchProjects();

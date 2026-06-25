@@ -169,8 +169,6 @@ const Tasks = () => {
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
-
     taskApi.deleteTask(id)
       .then(() => {
         fetchData();
